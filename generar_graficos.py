@@ -81,18 +81,21 @@ def generar_sparklines():
     gdp_df = pd.read_csv('data/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_26433.csv', skiprows=4)
     years = [str(year) for year in range(2010, 2024)]
     gdp_filtered = gdp_df.dropna(subset=years)
-    gdp_filtered['2023'] = pd.to_numeric(gdp_filtered['2023'], errors='coerce')
+    gdp_filtered.loc[:, '2023'] = pd.to_numeric(gdp_filtered['2023'], errors='coerce')
     top_countries = gdp_filtered.nlargest(10, '2023')
 
-    # Crear gráfico de Sparklines
-    fig, ax = plt.subplots(figsize=(10, 8))
-    for _, row in top_countries.iterrows():
-        ax.plot(years, row[years].values, marker='o', label=row['Country Name'])
-    ax.set_title('Sparklines: PIB per cápita (2010-2023) - Top 10 Países')
-    plt.xticks(rotation=45)
-    plt.xlabel('Año')
-    plt.ylabel('PIB per cápita (USD)')
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    fig, ax = plt.subplots(figsize=(8, 6))
+    for i, row in top_countries.iterrows():
+        sparkline = row[years].values
+        country_name = row['Country Name']
+        plt.subplot(5, 2, i + 1)
+        plt.plot(years, sparkline, marker='o', color='black', linewidth=1)
+        plt.fill_between(years, sparkline, alpha=0.3)
+        plt.title(country_name, fontsize=8)
+        plt.xticks([])
+        plt.yticks([])
+        plt.grid(False)
+        plt.box(False)
     plt.tight_layout()
     plt.savefig("img/Sparklines_plot.png")
     plt.close()
