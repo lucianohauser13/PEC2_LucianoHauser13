@@ -16,8 +16,8 @@ def crear_carpeta_img():
 
 def generar_treemap():
     # Cargar los archivos CSV
-    treemap_df = pd.read_csv("API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv", skiprows=4)
-    metadata_country_df = pd.read_csv("Metadata_Country_API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv")
+    treemap_df = pd.read_csv("data\API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv", skiprows=4)
+    metadata_country_df = pd.read_csv("data\Metadata_Country_API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv")
 
     # Filtrar países válidos
     valid_countries = metadata_country_df[metadata_country_df["Region"].notna()]["Country Code"].tolist()
@@ -42,8 +42,8 @@ def generar_treemap():
 
 def generar_arc_diagram():
     # Cargar datos
-    characters_df = pd.read_csv('starwars-characters.csv')
-    links_df = pd.read_csv('starwars-links.csv')
+    characters_df = pd.read_csv('data\starwars-characters.csv')
+    links_df = pd.read_csv('data\starwars-links.csv')
 
     # Filtrar personajes principales
     top_characters = characters_df.nlargest(20, 'scenes')
@@ -68,7 +68,7 @@ def generar_arc_diagram():
 
 def generar_sparklines():
     # Cargar datos
-    gdp_df = pd.read_csv('API_NY.GDP.PCAP.CD_DS2_en_csv_v2_26433.csv', skiprows=4)
+    gdp_df = pd.read_csv('data\API_NY.GDP.PCAP.CD_DS2_en_csv_v2_26433.csv', skiprows=4)
     years = [str(year) for year in range(2010, 2024)]
     gdp_filtered = gdp_df.dropna(subset=years)
     gdp_filtered['2023'] = pd.to_numeric(gdp_filtered['2023'], errors='coerce')
