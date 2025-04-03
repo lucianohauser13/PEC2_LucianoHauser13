@@ -16,7 +16,7 @@ def crear_carpeta_img():
 
 def generar_treemap():
     # Cargar los archivos CSV
-    treemap_df = pd.read_csv(os.path.join("data", "API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv"), skiprows=4)
+    treemap_df = pd.read_csv("data/API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv", skiprows=4)
     metadata_country_df = pd.read_csv("data/Metadata_Country_API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv")
 
     # Filtrar países válidos
