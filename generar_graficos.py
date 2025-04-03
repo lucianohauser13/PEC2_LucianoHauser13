@@ -115,7 +115,7 @@ def generar_sparklines():
     plt.tight_layout()
     
     # Guardar el gráfico en la ruta especificada
-    plt.savefig(output_path)
+    plt.savefig("img/Sparklines_plot.png")
     plt.close()
 
 
