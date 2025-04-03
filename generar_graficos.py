@@ -81,23 +81,41 @@ def generar_sparklines():
     gdp_df = pd.read_csv('data/API_NY.GDP.PCAP.CD_DS2_en_csv_v2_26433.csv', skiprows=4)
     years = [str(year) for year in range(2010, 2024)]
     gdp_filtered = gdp_df.dropna(subset=years)
-    gdp_filtered.loc[:, '2023'] = pd.to_numeric(gdp_filtered['2023'], errors='coerce')
+    
+    # Convertir el PIB de 2023 a numérico
+    gdp_filtered['2023'] = pd.to_numeric(gdp_filtered['2023'], errors='coerce')
     top_countries = gdp_filtered.nlargest(10, '2023')
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    for i, row in top_countries.iterrows():
+    # Crear el gráfico de Sparklines en formato compacto
+    fig, axes = plt.subplots(nrows=len(top_countries), ncols=1, figsize=(8, 10), sharex=True)
+
+    for ax, (index, row) in zip(axes, top_countries.iterrows()):
         sparkline = row[years].values
         country_name = row['Country Name']
-        plt.subplot(5, 2, i + 1)
-        plt.plot(years, sparkline, marker='o', color='black', linewidth=1)
-        plt.fill_between(years, sparkline, alpha=0.3)
-        plt.title(country_name, fontsize=8)
-        plt.xticks([])
-        plt.yticks([])
-        plt.grid(False)
-        plt.box(False)
+        
+        # Crear el Sparkline
+        ax.plot(years, sparkline, color='black', linewidth=1.5)
+        ax.scatter(years[-1], sparkline[-1], color='red')  # Punto final en rojo
+        ax.text(years[-1], sparkline[-1], f' {sparkline[-1]:.2f}', va='center', ha='left')
+        
+        # Eliminar detalles no esenciales para lograr el estilo minimalista de Sparklines
+        ax.set_yticks([])
+        ax.set_ylabel(country_name, rotation=0, labelpad=20, ha='right', va='center')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+
+    # Ajustes finales de la figura
+    axes[-1].set_xticks(years)
+    axes[-1].set_xticklabels(years, rotation=45)
+    axes[-1].set_xlabel('Año')
+
+    plt.suptitle('Sparklines: PIB per cápita (2010-2023) - Top 10 Países', y=1.02)
     plt.tight_layout()
-    plt.savefig("img/Sparklines_plot.png")
+    
+    # Guardar el gráfico en la ruta especificada
+    plt.savefig(output_path)
     plt.close()
 
 
