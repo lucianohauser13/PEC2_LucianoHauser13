@@ -98,7 +98,6 @@ def generar_sparklines():
     plt.close()
 
 
-crear_carpeta_img()
 generar_treemap()
 generar_arc_diagram()
 generar_sparklines()
