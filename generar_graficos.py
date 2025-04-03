@@ -8,12 +8,6 @@ import numpy as np
 import matplotlib.cm as cm
 
 
-# Verificar y crear la carpeta img si no existe
-def crear_carpeta_img():
-    if not os.path.exists("img"):
-        os.makedirs("img")
-
-
 def generar_treemap():
     # Cargar los archivos CSV
     treemap_df = pd.read_csv("data/API_NV.AGR.TOTL.ZS_DS2_en_csv_v2_13431.csv", skiprows=4)
@@ -41,27 +35,43 @@ def generar_treemap():
 
 
 def generar_arc_diagram():
-    # Cargar datos
-    characters_df = pd.read_csv('data/starwars-characters.csv')
-    links_df = pd.read_csv('data/starwars-links.csv')
+    # Cargar los archivos CSV
+    characters_df = pd.read_csv("data/starwars-characters.csv")
+    links_df = pd.read_csv("data/starwars-links.csv")
 
     # Filtrar personajes principales
     top_characters = characters_df.nlargest(20, 'scenes')
     top_ids = set(top_characters['number'])
     top_links = links_df[(links_df['scenes'] >= 20) & (links_df['character1'].isin(top_ids)) & (links_df['character2'].isin(top_ids))]
 
-    # Crear grafo
+    # Crear el grafo
     G = nx.Graph()
     for _, row in top_characters.iterrows():
         G.add_node(row['number'], label=row['name'], scenes=row['scenes'])
     for _, row in top_links.iterrows():
         G.add_edge(row['character1'], row['character2'], weight=row['scenes'])
 
-    # Dibujar Arc Diagram
+    # Ordenar nodos por el número de escenas
+    sorted_nodes = sorted(G.nodes(data=True), key=lambda x: x[1]['scenes'], reverse=True)
+    labels = {node: G.nodes[node]['label'] for node, _ in sorted_nodes}
+    colors = cm.get_cmap('tab20', len(sorted_nodes))
+
     plt.figure(figsize=(16, 8))
-    pos = {node: (i * 2, 0) for i, (node, _) in enumerate(sorted(G.nodes(data=True), key=lambda x: x[1]['scenes'], reverse=True))}
-    nx.draw(G, pos, with_labels=True, node_size=700, node_color='skyblue', font_size=12)
-    plt.title('Arc Diagram - Star Wars Character Interactions')
+    positions = {node: (i * 2, 0) for i, (node, _) in enumerate(sorted_nodes)}
+
+    for i, (node, _) in enumerate(sorted_nodes):
+        nx.draw_networkx_nodes(G, positions, nodelist=[node], node_size=300, node_color=[colors(i)], alpha=0.8)
+
+    nx.draw_networkx_labels(G, positions, labels, font_size=10, verticalalignment='top')
+
+    for (u, v, data) in G.edges(data=True):
+        x = np.linspace(positions[u][0], positions[v][0], 100)
+        y = np.sin(np.pi * (x - positions[u][0]) / (positions[v][0] - positions[u][0]))
+        color = colors(list(G.nodes).index(u))
+        plt.plot(x, y, linewidth=data['weight'] / 3, color=color, alpha=0.7)
+
+    plt.title('Arc Diagram - Star Wars Character Interactions (Colores Diferenciados)')
+    plt.axis('off')
     plt.savefig("img/arcdiagram_plot.png")
     plt.close()
 
